@@ -19,25 +19,35 @@ public class utility {
             e.printStackTrace();
         }
     }
-    public static int menu(String[] opzioni, Scanner keyboard)
-    {
+    public static int menu(String[] opzioni, Scanner keyboard) {
         int scelta;
 
         do {
             ClrScr();
-            System.out.println("=== "+opzioni[0]+" ===");
-            for(int i=1;i<opzioni.length;i++)
-            {
+            System.out.println("=== " + opzioni[0] + " ===");
+            for (int i = 1; i < opzioni.length; i++) {
                 System.out.println(opzioni[i]);
             }
-            scelta = Integer.parseInt(keyboard.nextLine());
-            if(scelta<1 || scelta>opzioni.length-1)
-            {
-                System.out.println("Valore errato. Riprova");
+
+            String input = keyboard.nextLine();
+
+            if (input.isEmpty()) {
+                System.out.println("Input vuoto. Riprova.");
                 Wait(3);
+                scelta = -1; // Impostare una scelta non valida per far ripetere il loop
+            } else {
+                try {
+                    scelta = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Input non valido. Inserisci un numero.");
+                    Wait(3);
+                    scelta = -1; // Impostare una scelta non valida per far ripetere il loop
+                }
             }
-        }while(scelta<1 || scelta>opzioni.length-1);
+
+        } while (scelta < 1 || scelta > opzioni.length - 1);
 
         return scelta;
     }
+
 }

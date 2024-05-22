@@ -7,6 +7,9 @@ public class Utente {
     public String username;
     public static String password;
     //public static boolean autentified=Autentificazione;
+    public boolean isAuthenticated=false;
+
+    public double mySaldo=0;
     public static String[] menuUtente = {
             "MODIFICA PROFILO",
             "[1]-Visualizza credenziali",
@@ -78,8 +81,13 @@ public class Utente {
         System.out.println("|---------------------------------------|");
         System.out.println("| Username          : " + String.format("%-20s", this.username) + "|");
         System.out.println("| Password           : " + String.format("%-20s", censorPassword(password)) + "|");
-       // if (Autentificazione=true) {
+       // if (Autentificazione=true) {, else devi fare l'accesso per attivare il super utente
+        if(isAuthenticated) {
             System.out.println("| SUPER-UTENTE           :ON");//se è off aggiungo che per diventare super utente devi prima accedere
+        }else{
+            System.out.println("| SUPER-UTENTE           :OFF");
+            System.out.println("| Per diventare super utente devi prima accedere. |");
+        }
             System.out.println("|---------------------------------------|");
         }
 

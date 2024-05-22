@@ -1,4 +1,6 @@
 import static tools.utility.*;
+
+import java.util.Arrays;
 import java.util.Random;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,20 +17,27 @@ public class Main {
                 "[6] Cancellazione",
                 "[7] Inserisci saldo",
                 "[8] Telefona",
-                "[9] Nascondi contatto dall'elenco",
-                "[10] Ordina",
-                "[11] Impostazioni utente",
-                "[12] Fine"};
+                "[9]Visualizza chiamate recenti",
+                "[10] Nascondi contatto dall'elenco",
+                "[11] Ordina", //lista contatti o chiamate recenti
+                "[12] Impostazioni utente",
+                "[13] Fine"};
         boolean Sitel = true;
         final int nMax = 3;
         int contrattiVenduti = 0;
         int posizione = 0;
         boolean anotherPw = false;
+        String [] recentCalls=new String[5];
         Scanner keyboard = new Scanner(System.in);
         String fileName = "";
         Contatto[] gestore = new Contatto[nMax];
+        Utente saldoUtente = new Utente();
        String generatedPw=null;
         Utente myUtente = new Utente();
+        System.out.println("=========================================");
+        System.out.println("              AUTENTICAZIONE             ");
+        System.out.println("=========================================");
+        System.out.println("Per accedere al sistema, è necessario effettuare il login.");
         System.out.println("Inserisci l'username: ");
         myUtente.username = keyboard.nextLine();
         System.out.println("Vuoi richiedere una password per la gestione dei contatti nascosti? (si/no)");
@@ -50,9 +59,15 @@ public class Main {
                 case 1:
 
                     if (contrattiVenduti < nMax) {
-                        //firma contratto
-                        gestore[contrattiVenduti] = leggiPersona(Sitel, keyboard);
-                        contrattiVenduti++;
+                        //Chiedo all'utente di accedere
+                        System.out.println("Per aggiungere un nuovo contatto devi prima effettuare l'acesso");
+                        if (Autentificazione(myUtente, generatedPw, keyboard)) {
+                            //firma contratto
+                            gestore[contrattiVenduti] = leggiPersona(Sitel, keyboard);
+                            contrattiVenduti++;
+                        }else{
+                            System.out.println("Username o password errati");
+                        }
                     } else {
                         System.out.println("Non ci sono più contratti da vendere");
                     }
@@ -131,57 +146,30 @@ public class Main {
 
                     break;
                 case 7:
-                    Contatto Saldo = new Contatto();
-                    System.out.println("Inserisci nome: ");
-                    Saldo.nome = keyboard.nextLine();
-                    System.out.println("Inserisci cognome: ");
-                    Saldo.cognome = keyboard.nextLine();
-                    if (ricerca(gestore, Saldo, contrattiVenduti) == true) {
-                        posizione = RicercaIndex(gestore, Saldo, contrattiVenduti);
-                        SaldoTelefonico(gestore, keyboard, posizione);
-                    } else {
-                        System.out.println("Contatto inesistente");
+                    //Aggiungere saldo al mio Utente.
+                    if(Autentificazione(myUtente, generatedPw, keyboard)) {
+                        System.out.println("Inserisci il saldo telefonico: ");
+                        saldoUtente.mySaldo = keyboard.nextDouble();
+                    }else{
+                        System.out.println("Username o password errati");
                     }
                     break;
 
                 case 8:
-                    //Telefona
-                    if (contrattiVenduti != 0) {
-                        System.out.println("Inserisci il nome o il numero di telefono della persona a cui vuoi telefonare: ");
-                        String nomeOTelefono = keyboard.nextLine();
+                    //Effettua una chiamata
 
-                        // Cerca il contatto nella lista
-                        boolean trovato = false;
-                        for (int i = 0; i < contrattiVenduti; i++) {
-                            if (gestore[i].nome.equalsIgnoreCase(nomeOTelefono) || gestore[i].telefono.equals(nomeOTelefono)) {
-                                trovato = true;
-                                Contatto contatto = gestore[i]; //Contatto trovato
-
-                                // Controlla il saldo prima di effettuare la chiamata
-                                if (contatto.saldoTelefonico >= 0.50) { // Controlla che ci sia abbastanza saldo per 1 minuto di chiamata
-                                    System.out.println("Stai telefonando a " + contatto.nome + " " + contatto.cognome + " al numero " + contatto.telefono);
-                                    // Simula la telefonata
-                                    while (contatto.saldoTelefonico >= 0.50) {
-                                        contatto.saldoTelefonico -= 0.50; // Decrementa il saldo ogni minuto di chiamata
-                                        System.out.println("Durata della chiamata: 1 minuto");
-                                        System.out.println("Saldo rimanente: " + contatto.saldoTelefonico);
-                                        // Qui puoi aggiungere ulteriori azioni per la telefonata
-                                    }
-                                } else {
-                                    System.out.println("Saldo insufficiente per effettuare la chiamata.");
-                                }
-                                break; // Esci dal ciclo una volta trovato il contatto
-                            }
-                        }
-
-                        if (!trovato) {
-                            System.out.println("Nessun contatto trovato con questo nome o numero di telefono.");
-                        }
-                    } else {
-                        System.out.println("Non sono ancora presenti contratti venduti.");
+                    String callInfo = myCalls(contrattiVenduti, gestore,saldoUtente, keyboard,recentCalls);
+                    if (callInfo != null) {
+                        System.out.println("Chiamata effettuata:\n" + callInfo);
                     }
                     break;
                 case 9:
+                    //visualizza chiamate recenti
+                   // String [] recentCalls1=new String[5];
+                    viewRecentCalls(recentCalls);
+
+                    break;
+                case 10:
                     //nascondi contatto dall'elenco:
                        // se l'utente all'inizio del programma ha deciso di impostare una password
 
@@ -200,25 +188,11 @@ public class Main {
                     break;
 
 
-                case 10:
-                    String[] menuOrdinamento = {"ORDINA TRAMITE: ",
-                            "[1]-Bubble-Sort",
-                            "[2]-Selection-Sort",
-                    };
-                    switch (menu(menuOrdinamento, keyboard)) {
+                case 11:
 
-                        case 1:
-                            //Ordinamento tramite bubble-sort
-                            bubbleSort(gestore, contrattiVenduti);
-                            break;
+                    //Ordinamento tramite bubble-sort
+                    bubbleSort(gestore, contrattiVenduti);
 
-                        case 2:
-                            // selectionSort(); utilizziamo il selection sort per ordinare in questo caso
-                            break;
-
-                        default:
-                            break;
-                    }
                     break;
                 /*case 11:
                     try {
@@ -236,7 +210,7 @@ public class Main {
                     //carica file;
 
                     break;*/
-                case 11:
+                case 12:
                     //Profilo: funzione che permette di modificare l'utente:
 
                     if (myUtente != null) {
@@ -315,7 +289,82 @@ public class Main {
 
 
     }
+    public static String myCalls(int contrattiVenduti, Contatto[] gestore, Utente saldoUtente, Scanner keyboard, String[] recentCalls) {
+        if (contrattiVenduti != 0) {
+            System.out.println("Inserisci il nome o il numero di telefono della persona a cui vuoi telefonare: ");
+            String nomeOTelefono = keyboard.nextLine();
 
+            // Cerca il contatto nella lista
+            boolean trovato = false;
+            for (int i = 0; i < contrattiVenduti; i++) {
+                if (gestore[i].nome.equalsIgnoreCase(nomeOTelefono) || gestore[i].telefono.equals(nomeOTelefono)) {
+                    trovato = true;
+                    Contatto contatto = gestore[i]; // Contatto trovato
+
+                    // Controlla il saldo prima di effettuare la chiamata
+                    double costoChiamata = 0.50; // Costo per ogni minuto di chiamata
+                    if (saldoUtente.mySaldo >= costoChiamata) {
+                        System.out.println("Stai telefonando a " + contatto.nome + " " + contatto.cognome + " al numero " + contatto.telefono);
+                        int durata = 0; // Durata della chiamata in secondi
+
+                        // Simula la telefonata
+                        while (saldoUtente.mySaldo >= costoChiamata) {
+                            saldoUtente.mySaldo -= costoChiamata; // Decrementa il saldo ogni minuto di chiamata
+                            durata += 60; // Incrementa la durata della chiamata di 60 secondi
+                            System.out.println("Durata della chiamata: " + durata + " secondi");
+                            System.out.println("Saldo rimanente: " + saldoUtente.mySaldo);
+
+                            // Controllo se c'è abbastanza saldo per un altro minuto di chiamata
+                            if (saldoUtente.mySaldo < costoChiamata) {
+                                System.out.println("Saldo insufficiente per continuare la chiamata.");
+                                break; // Esci dal ciclo se il saldo non è sufficiente per un altro minuto di chiamata
+                            }
+
+                            // Qui puoi aggiungere ulteriori azioni per la telefonata
+                        }
+
+                        // Formatta il risultato della chiamata
+                        String callInfo = String.format("Nome: %s, Telefono: %s, Durata: %d secondi", contatto.nome, contatto.telefono, durata);
+                        // Aggiungi la chiamata alla lista delle chiamate recenti
+                        addToRecentCalls(callInfo, recentCalls);
+                        return callInfo;
+                    } else {
+                        System.out.println("Saldo insufficiente per effettuare la chiamata.");
+                    }
+                    break; // Esci dal ciclo una volta trovato il contatto
+                }
+            }
+
+            if (!trovato) {
+                System.out.println("Nessun contatto trovato con questo nome o numero di telefono.");
+            }
+        } else {
+            System.out.println("Non sono ancora presenti contratti venduti.");
+        }
+        return null;
+    }
+
+    private static void addToRecentCalls(String callInfo, String[] recentCalls) {
+        // Sposta tutte le chiamate recenti verso l'alto per fare spazio alla nuova chiamata
+        for (int i = recentCalls.length - 1; i > 0; i--) {
+            recentCalls[i] = recentCalls[i - 1];
+        }
+        // Aggiungi la nuova chiamata alla prima posizione della lista delle chiamate recenti
+        recentCalls[0] = callInfo;
+    }
+    /**
+     * @param recentCalls: is for the array string of recentCalls
+     *
+     */
+
+    private static void viewRecentCalls(String[] recentCalls) {
+        System.out.println("Chiamate recenti:");
+        for (String call : recentCalls) {
+            if (call != null) {
+                System.out.println(call);
+            }
+        }
+    }
     public static void bubbleSort(Contatto [] gestore, int contrattiVenduti) {
         int n =contrattiVenduti;
         for (int i = 0; i < n - 1; i++) {
@@ -456,9 +505,14 @@ public class Main {
         System.out.println("Inserisci la password: ");
         String password = keyboard.nextLine();
 
-        return myUtente.username.equals(username) && generatedPw.equals(password);
+        if (myUtente.username.equals(username) && generatedPw.equals(password)) {
+            myUtente.isAuthenticated = true;
+            return true;
+        } else {
+            myUtente.isAuthenticated = false;
+            return false;
+        }
     }
-
 
 
     private static String generaPassword() {
