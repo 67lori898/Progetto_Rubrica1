@@ -163,12 +163,20 @@ public class Main {
                         System.out.println("Chiamata effettuata:\n" + callInfo);
                     }
                     break;
-                case 9:
-                    //visualizza chiamate recenti
-                   // String [] recentCalls1=new String[5];
-                    viewRecentCalls(recentCalls);
 
+                case 9:
+                    // Visualizza chiamate recenti
+                    viewRecentCalls(recentCalls);
+                    System.out.println("\nDesideri ordinare le chiamate recenti [si/no]?");
+                    String risposta = keyboard.nextLine().toLowerCase();
+                    if (risposta.equals("si")) {
+                        ordinaChiamateRecenti(recentCalls);
+                        System.out.println("Chiamate recenti ordinate per durata.");
+                        viewRecentCalls(recentCalls);
+                    }
                     break;
+
+
                 case 10:
                     //nascondi contatto dall'elenco:
                        // se l'utente all'inizio del programma ha deciso di impostare una password
@@ -385,6 +393,7 @@ public class Main {
             }
         }
     }
+
     private static void bubbleSortName(Contatto [] gestore) {
 
         int n = gestore.length;
@@ -401,14 +410,31 @@ public class Main {
             }
         }
     }
-
-    private static void selectionSort(Contatto [] gestore){
-     //Metofo che ordina i contatti implementado l'algoritmo di selection-sort.
-
-
-
-
+    //Ordina le chiamate recenti in base alla loro durata
+    public static void ordinaChiamateRecenti(String[] recentCalls) {
+        for (int i = 0; i < recentCalls.length - 1; i++) {
+            for (int j = 0; j < recentCalls.length - 1 - i; j++) {
+                if (recentCalls[j] != null && recentCalls[j + 1] != null) {
+                    int durata1 = Integer.parseInt(recentCalls[j].split(",")[2].split(" ")[2]);
+                    int durata2 = Integer.parseInt(recentCalls[j + 1].split(",")[2].split(" ")[2]);
+                    if (durata1 < durata2) {
+                        String temp = recentCalls[j];
+                        recentCalls[j] = recentCalls[j + 1];
+                        recentCalls[j + 1] = temp;
+                    }
+                }
+            }
+        }
     }
+
+     /*DEBUG: metodo che permette di ordinare la lista di contatti usando il selection sort
+     *
+     * private static void selectionSort(Contatto [] gestore){
+      }
+     *
+     *
+     * */
+
     private static boolean ricerca(Contatto[] gestore, Contatto contatto, int contrattiVenduti) {
         //Controllo se il nome e il cognome del contatto e ugale al nome e cogome del gestore
         boolean ricerca = false;
