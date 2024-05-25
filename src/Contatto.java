@@ -18,24 +18,37 @@ public class Contatto {
             this.nome = nome;
             this.cognome = cognome;
             this.telefono = telefono;
+            this.tipo = tipo;
             this.contactHidden = false; // Per default, il contatto è visibile
-          //  this.saldoTelefonico = 0.0;
+            this.saldoTelefonico = 0; //imposto valore di default
         }
-    public String getName() {
-        return nome;
-    }
 
-    public void setName(String nome) {
-        this.nome = nome;
-    }
 
-    public String getSurname() {
-        return cognome;
-    }
 
-    public void setSurname(String surname) {
-        this.cognome = cognome;
+    /* metod get/set */
+    public String getNome(){
+        return this.nome;
     }
+    public String getCognome(){
+        return this.cognome;
+    }
+    public String getTelefono(){
+        return this.telefono;
+    }
+    public tipoContratto getTipo(){ return this.tipo; }
+    public double getRicarica(){ return this.saldoTelefonico; }
+
+    public void setNome(String nome){
+        this.nome=nome;
+    }
+    public void setCognome(String cognome){
+        this.cognome=cognome;
+    }
+    public void setTipo(tipoContratto tipo){
+        this.tipo=tipo;
+    }
+    public void setTelefono(String telefono){ this.telefono=telefono; }
+    public void setRicarica(double importo){ this.saldoTelefonico += importo; }
 
 
     public String stampa()

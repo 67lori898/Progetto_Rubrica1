@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
+    public static String generatedPw;
+
     public static void main(String[] args) {
         String[] operazioni = {"VODAFONE",
                 "[1] Inserimento",
@@ -24,7 +26,7 @@ public class Main {
                 "[13] Fine"};
         boolean Sitel = true;
         final int nMax = 3;
-        int contrattiVenduti = 0;
+         int contrattiVenduti = 0;
         int posizione = 0;
         boolean anotherPw = false;
         String [] recentCalls=new String[5];
@@ -32,7 +34,6 @@ public class Main {
         String fileName = "";
         Contatto[] gestore = new Contatto[nMax];
         Utente saldoUtente = new Utente();
-       String generatedPw=null;
         Utente myUtente = new Utente();
         System.out.println("=========================================");
         System.out.println("              AUTENTICAZIONE             ");
@@ -40,7 +41,7 @@ public class Main {
         System.out.println("Per accedere al sistema, è necessario effettuare il login.");
         System.out.println("Inserisci l'username: ");
         myUtente.username = keyboard.nextLine();
-        System.out.println("Vuoi richiedere una password per la gestione dei contatti nascosti? (si/no)");
+        System.out.println("Vuoi richiedere una password per la gestione delle attività principali? (si/no)");
         String myAnswer = keyboard.nextLine().toLowerCase();
         //Login nel programma:
         if (myAnswer.equalsIgnoreCase("si")) {
@@ -147,9 +148,10 @@ public class Main {
                     break;
                 case 7:
                     //Aggiungere saldo al mio Utente.
+
                     if(Autentificazione(myUtente, generatedPw, keyboard)) {
                         System.out.println("Inserisci il saldo telefonico: ");
-                        saldoUtente.mySaldo = keyboard.nextDouble();
+                        saldoUtente.saldoTel= keyboard.nextDouble();
                     }else{
                         System.out.println("Username o password errati");
                     }
@@ -202,7 +204,7 @@ public class Main {
                     bubbleSort(gestore, contrattiVenduti);
 
                     break;
-                /*case 11:
+                /*DEBUG:case 11:
                     try {
                         //FileName è un parametro.
                         scriviFile("fileName.csv", gestore, contrattiVenduti);
@@ -219,10 +221,10 @@ public class Main {
 
                     break;*/
                 case 12:
-                    //Profilo: funzione che permette di modificare l'utente:
+                    //Profilo: funzione che permette di gestire le impostazioni dell'account:
 
                     if (myUtente != null) {
-                        myUtente.stampaInfo();
+                        myUtente.stampaInfo(myUtente.isAuthenticated);
                         myUtente.modificaUtente(keyboard,myUtente);
                     } else {
                         System.out.println("Impossibile accedere alle impostazioni utente");
@@ -311,19 +313,19 @@ public class Main {
 
                     // Controlla il saldo prima di effettuare la chiamata
                     double costoChiamata = 0.50; // Costo per ogni minuto di chiamata
-                    if (saldoUtente.mySaldo >= costoChiamata) {
+                    if (saldoUtente.saldoTel >= costoChiamata) {
                         System.out.println("Stai telefonando a " + contatto.nome + " " + contatto.cognome + " al numero " + contatto.telefono);
                         int durata = 0; // Durata della chiamata in secondi
 
                         // Simula la telefonata
-                        while (saldoUtente.mySaldo >= costoChiamata) {
-                            saldoUtente.mySaldo -= costoChiamata; // Decrementa il saldo ogni minuto di chiamata
+                        while (saldoUtente.saldoTel >= costoChiamata) {
+                            saldoUtente.saldoTel -= costoChiamata; // Decrementa il saldo ogni minuto di chiamata
                             durata += 60; // Incrementa la durata della chiamata di 60 secondi
                             System.out.println("Durata della chiamata: " + durata + " secondi");
-                            System.out.println("Saldo rimanente: " + saldoUtente.mySaldo);
+                            System.out.println("Saldo rimanente: " + saldoUtente.saldoTel);
 
                             // Controllo se c'è abbastanza saldo per un altro minuto di chiamata
-                            if (saldoUtente.mySaldo < costoChiamata) {
+                            if (saldoUtente.saldoTel < costoChiamata) {
                                 System.out.println("Saldo insufficiente per continuare la chiamata.");
                                 break; // Esci dal ciclo se il saldo non è sufficiente per un altro minuto di chiamata
                             }
@@ -541,7 +543,7 @@ public class Main {
     }
 
 
-    private static String generaPassword() {
+    public static String generaPassword() {
         // Definisci i caratteri che potrebbero essere inclusi nella password
         String caratteri = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
 

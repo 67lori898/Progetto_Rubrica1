@@ -19,6 +19,22 @@ public class utility {
             e.printStackTrace();
         }
     }
+    public static String censorPassword(String password) {
+        if (password == null) {
+            return "N/A"; //Se la passworde non è stata ancora inizializzata
+        }
+        // Crea una nuova StringBuilder per costruire la password censurata
+        StringBuilder censored = new StringBuilder();
+
+        // Itera su ogni carattere della password
+        for (int i = 0; i < password.length(); i++) {
+            // Aggiungi un asterisco (*) per ogni carattere della password originale
+            censored.append('*');
+        }
+
+        // Converti la StringBuilder in una String e restituiscila
+        return censored.toString();
+    }
     public static int menu(String[] opzioni, Scanner keyboard) {
         int scelta;
 
@@ -39,8 +55,8 @@ public class utility {
                 try {
                     scelta = Integer.parseInt(input);
                 } catch (NumberFormatException e) {
-                    System.out.println("Input non valido. Inserisci un numero.");
-                    Wait(3);
+                    System.out.println("Input non valido. Inserisci un numero valido.");
+                    Wait(1);
                     scelta = -1; // Impostare una scelta non valida per far ripetere il loop
                 }
             }
